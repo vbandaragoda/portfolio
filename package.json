@@ -10,7 +10,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.0",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
     "jquery": "^3.7.1",

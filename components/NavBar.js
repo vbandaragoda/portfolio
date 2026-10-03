@@ -71,7 +71,7 @@ function Navbar({ darkMode, toggleDarkMode }) {
           />
         </li>
         <li>
-          <a href="https://drive.google.com/file/d/1S-6-eiaoG7Y1dIewtGveDu9-D7OgqtQS/view?usp=sharing"
+          <a href="https://drive.google.com/file/d/1mTHi7QIsUehgRbgx9URDEGe_XokwLiSW/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-4 py-2 rounded-md ml-8"
