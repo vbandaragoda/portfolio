@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-const contactEmail = "vimukthi.nelanga@gmail.com";
+const formspreeEndpoint =
+  process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ||
+  "https://formspree.io/f/xgavgqpn";
 
 const initialForm = {
   email: "",
@@ -22,9 +24,10 @@ const ContactForm = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const honeypot = new FormData(event.currentTarget).get("_gotcha");
     const submission = {
       email: form.email.trim(),
       subject: form.subject.trim(),
@@ -39,17 +42,49 @@ const ContactForm = () => {
       return;
     }
 
-    const body = `Hello Vimukthi,\n\n${submission.message}\n\nReply to: ${submission.email}`;
-    const mailtoUrl = `mailto:${contactEmail}?subject=${encodeURIComponent(
-      submission.subject,
-    )}&body=${encodeURIComponent(body)}`;
+    if (!formspreeEndpoint) {
+      setStatus({
+        type: "error",
+        message: "The contact form is not configured yet. Please try again later.",
+      });
+      return;
+    }
 
-    setStatus({
-      type: "success",
-      message: "Email draft opened. Review it in your email app and press Send.",
-    });
-    window.location.href = mailtoUrl;
+    setStatus({ type: "loading", message: "Sending your message…" });
+
+    try {
+      const response = await fetch(formspreeEndpoint, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...submission,
+          _gotcha: honeypot,
+          _subject: `Portfolio contact: ${submission.subject}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Formspree returned ${response.status}`);
+      }
+
+      setForm(initialForm);
+      setStatus({
+        type: "success",
+        message: "Thanks! Your message has been sent successfully.",
+      });
+    } catch (error) {
+      console.error("Unable to send contact message:", error);
+      setStatus({
+        type: "error",
+        message: "Your message could not be sent. Please try again in a moment.",
+      });
+    }
   };
+
+  const isSubmitting = status.type === "loading";
 
   return (
     <section id="contact" className="bg-white px-5 dark:bg-gray-900">
@@ -63,6 +98,14 @@ const ContactForm = () => {
         </p>
 
         <form className="space-y-8" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="_gotcha"
+            className="hidden"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
           <div>
             <label
               htmlFor="email"
@@ -124,9 +167,10 @@ const ContactForm = () => {
 
           <button
             type="submit"
-            className="block py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-teal-600 hover:bg-teal-700 sm:w-fit focus:ring-4 focus:outline-none focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 mx-auto"
+            disabled={isSubmitting}
+            className="block py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-teal-600 hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit focus:ring-4 focus:outline-none focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 mx-auto"
           >
-            Open email draft
+            {isSubmitting ? "Sending…" : "Send message"}
           </button>
 
           {status.message && (

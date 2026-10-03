@@ -7,9 +7,11 @@ import {
 
 const About = () => {
   return (
-    <section id="about" className="min-h-screen">
-      <div className="text-center p-1">
-        <div className="mx-auto rounded-full w-80 h-80 mt-10 mb-10 bg-center sm:bg-center md:h-50 md:w-50 bg-[url('/pic.png')] bg-cover"></div>
+    <section
+      id="about"
+      className="min-h-screen flex items-center justify-center"
+    >
+      <div className="w-full text-center p-1">
         <h2 className="text-5xl py-2 text-teal-600 font-medium md:text-6xl">
           Vimukthi Bandaragoda
         </h2>
